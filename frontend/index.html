@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clasificador de Correos — IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ LOGIN ══ -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+    </div>
+    <h1>Clasificador de Correos</h1>
+    <p class="login-sub">Ingresá tus credenciales para acceder al sistema</p>
+
+    <div class="form-group">
+      <label for="login-user">Usuario</label>
+      <input type="text" id="login-user" placeholder="admin" autocomplete="username" />
+    </div>
+    <div class="form-group">
+      <label for="login-pass">Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <div class="error-msg" id="login-error">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span></span>
+    </div>
+
+    <button class="btn btn-primary" id="btn-login" style="margin-top:10px">
+      <div class="spinner"></div>
+      <span class="btn-label">Iniciar sesión</span>
+    </button>
+
+    <div class="login-hint">
+      <strong style="color:#818CF8">Demo:</strong>&nbsp; admin / admin123 &nbsp;·&nbsp; operador / op123
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ APP ══ -->
+<div id="app" class="app-wrapper" style="display:none">
+
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <div class="logo-icon">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1>Sistema de Clasificación de Correos</h1>
+        <p>Análisis y derivación automática · Powered by IA</p>
+      </div>
+      <nav class="main-nav">
+        <button class="nav-btn active" data-tab="clasificar">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:5px"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Clasificar
+        </button>
+        <button class="nav-btn" data-tab="historial">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:5px"><path d="M12 8v4l3 3M3.05 11a9 9 0 1 0 .5-3"/><path d="M3 4v4h4"/></svg>
+          Historial
+        </button>
+        <button class="nav-btn" data-tab="estadisticas">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:5px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Estadísticas
+        </button>
+        <button class="nav-btn" data-tab="admin" id="nav-admin">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:5px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Admin
+        </button>
+      </nav>
+      <div class="user-info">
+        <span id="user-badge"></span>
+        <button class="btn-logout" id="btn-logout" title="Cerrar sesión">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ─── Tab: Clasificar ──────────────────────────────────────── -->
+    <div id="tab-clasificar" class="tab-content active">
+      <div class="content">
+
+        <!-- Formulario -->
+        <section>
+          <div class="card">
+            <div class="card-header">
+              <h2>
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </span>
+                Nuevo correo
+              </h2>
+            </div>
+            <div class="card-body">
+              <form id="classify-form" novalidate>
+                <div class="form-group">
+                  <label for="asunto">Asunto</label>
+                  <input type="text" id="asunto" placeholder="Ej: Problema con mi factura del mes de mayo" maxlength="500" required />
+                </div>
+                <div class="form-group">
+                  <label for="contenido">Contenido del correo</label>
+                  <textarea id="contenido" placeholder="Pegá o escribí el cuerpo del correo aquí…" required></textarea>
+                </div>
+
+                <div class="error-msg" id="error-msg">
+                  <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  <span></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="btn-classify" style="margin-top:8px">
+                  <div class="spinner"></div>
+                  <span class="btn-label">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Clasificar con IA
+                  </span>
+                </button>
+              </form>
+
+              <!-- Resultado -->
+              <div id="result-section">
+                <div class="result-divider"></div>
+                <p class="result-label">Resultado de clasificación</p>
+                <div class="result-grid">
+                  <div class="result-item">
+                    <label>Categoría</label>
+                    <div class="value" id="res-categoria">—</div>
+                  </div>
+                  <div class="result-item">
+                    <label>Área responsable</label>
+                    <div class="value" id="res-area">—</div>
+                  </div>
+                  <div class="result-item">
+                    <label>Prioridad</label>
+                    <div class="value" id="res-prioridad">—</div>
+                  </div>
+                  <div class="result-item">
+                    <label>Clasificado</label>
+                    <div class="value" id="res-fecha" style="font-size:13px;font-weight:500">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Panel lateral: resumen rápido -->
+        <section>
+          <div class="card" style="height:100%">
+            <div class="card-header">
+              <h2>
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                  </svg>
+                </span>
+                Resumen del sistema
+              </h2>
+            </div>
+            <div class="card-body">
+              <div class="quick-stats" id="quick-stats">
+                <div class="qs-item">
+                  <span class="qs-num" id="qs-total">—</span>
+                  <span class="qs-label">Total clasificados</span>
+                </div>
+                <div class="qs-item">
+                  <span class="qs-num red" id="qs-alta">—</span>
+                  <span class="qs-label">Prioridad Alta</span>
+                </div>
+                <div class="qs-item">
+                  <span class="qs-num yellow" id="qs-media">—</span>
+                  <span class="qs-label">Prioridad Media</span>
+                </div>
+                <div class="qs-item">
+                  <span class="qs-num green" id="qs-baja">—</span>
+                  <span class="qs-label">Prioridad Baja</span>
+                </div>
+              </div>
+
+              <p class="section-label" style="margin-top:4px">Distribución por categoría</p>
+              <div id="cat-bars"></div>
+            </div>
+          </div>
+          <!-- Agregar al final del card-body del resumen -->
+<hr style="margin:16px 0;border:none;border-top:1px solid var(--border)">
+<p class="section-label">Gmail</p>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+  <span id="gmail-estado-badge" style="font-size:11px;color:var(--text-muted)">
+    Verificando...
+  </span>
+  <button class="btn btn-secondary" id="btn-sincronizar-gmail"
+    style="padding:6px 12px;font-size:12px">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+      viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:4px">
+      <polyline points="23 4 23 10 17 10"/>
+      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+    </svg>
+    Sincronizar ahora
+  </button>
+</div>
+<p id="gmail-sync-msg" style="font-size:12px;color:var(--text-muted);margin-top:8px"></p>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ─── Tab: Historial ───────────────────────────────────────── -->
+    <div id="tab-historial" class="tab-content" style="display:none">
+      <div class="page-content">
+        <div class="card">
+          <div class="card-header">
+            <h2>
+              <span class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 8v4l3 3M3.05 11a9 9 0 1 0 .5-3"/><path d="M3 4v4h4"/>
+                </svg>
+              </span>
+              Historial de clasificaciones
+            </h2>
+            <div class="filters">
+  <input type="text" id="filtro-busqueda" placeholder="Buscar por asunto o contenido…" class="filter-input" />
+  
+  <select id="filtro-categoria" class="filter-select">
+    <option value="">Todas las categorías</option>
+    <option>Consulta General</option>
+    <option>Reclamo</option>
+    <option>Soporte Técnico</option>
+    <option>Ventas</option>
+    <option>Facturación</option>
+    <option>Recursos Humanos</option>
+    <option>Otros</option>
+  </select>
+  
+  <select id="filtro-prioridad" class="filter-select">
+    <option value="">Todas las prioridades</option>
+    <option>Alta</option>
+    <option>Media</option>
+    <option>Baja</option>
+  </select>
+
+  <input type="date" id="filtro-desde" class="filter-select" title="Desde" />
+  <input type="date" id="filtro-hasta" class="filter-select" title="Hasta" />
+
+  <button class="btn btn-secondary" id="btn-filtrar">Filtrar</button>
+  <button class="btn btn-ghost" id="btn-limpiar">Limpiar</button>
+</div>
+            <!-- Botón exportar — agregar al final del div filters -->
+<button class="btn btn-secondary" id="btn-exportar" title="Exportar a Excel">
+  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+  </svg>
+  Exportar Excel
+</button>
+          </div>
+          <div class="card-body" style="padding-top:8px">
+            <div class="history-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Asunto</th>
+                    <th>Categoría</th>
+                    <th>Área responsable</th>
+                    <th>Prioridad</th>
+                    <th>Usuario</th>
+                    <th>Fecha</th>
+                    <th id="th-acciones"></th>
+                  </tr>
+                </thead>
+                <tbody id="history-body">
+                  <tr><td colspan="8"><div class="empty-state"><p>Cargando historial…</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" id="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Tab: Estadísticas ────────────────────────────────────── -->
+    <div id="tab-estadisticas" class="tab-content" style="display:none">
+      <div class="page-content">
+        <div class="stats-grid">
+
+          <!-- KPIs -->
+          <div class="card stat-card-full">
+            <div class="card-body" style="padding:0">
+              <div class="kpi-row" id="kpi-row">
+                <div class="kpi"><span class="kpi-n" id="kpi-total">—</span><span class="kpi-l">Total clasificados</span></div>
+                <div class="kpi"><span class="kpi-n red" id="kpi-alta">—</span><span class="kpi-l">Alta prioridad</span></div>
+                <div class="kpi"><span class="kpi-n yellow" id="kpi-media">—</span><span class="kpi-l">Media prioridad</span></div>
+                <div class="kpi"><span class="kpi-n green" id="kpi-baja">—</span><span class="kpi-l">Baja prioridad</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Por categoría -->
+          <div class="card">
+            <div class="card-header">
+              <h2>
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                  </svg>
+                </span>
+                Por categoría
+              </h2>
+            </div>
+            <div class="card-body"><div id="chart-categoria"></div></div>
+          </div>
+
+          <!-- Por prioridad -->
+          <div class="card">
+            <div class="card-header">
+              <h2>
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                  </svg>
+                </span>
+                Por prioridad
+              </h2>
+            </div>
+            <div class="card-body"><div id="chart-prioridad"></div></div>
+          </div>
+
+          <!-- Últimos 7 días -->
+          <div class="card stat-card-full">
+            <div class="card-header">
+              <h2>
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </span>
+                Clasificaciones — últimos 7 días
+              </h2>
+            </div>
+            <div class="card-body"><div id="chart-dias"></div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Tab: Admin ───────────────────────────────────────────── -->
+    <div id="tab-admin" class="tab-content" style="display:none">
+      <div class="page-content">
+        <div class="card">
+          <div class="card-header">
+            <h2>
+              <span class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </span>
+              Panel de administración
+            </h2>
+          </div>
+          <div class="card-body">
+            <div class="admin-info">
+              Solo el rol <strong>admin</strong> puede eliminar registros del historial. Esta acción es irreversible.
+            </div>
+            <div class="history-wrap" style="margin-top:18px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th><th>Asunto</th><th>Categoría</th>
+                    <th>Prioridad</th><th>Usuario</th><th>Fecha</th><th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-body">
+                  <tr><td colspan="7"><div class="empty-state"><p>Cargando…</p></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" id="admin-pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

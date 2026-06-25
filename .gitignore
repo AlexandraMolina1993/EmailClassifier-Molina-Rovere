@@ -1,0 +1,21 @@
+﻿# Node
+node_modules/
+npm-debug.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Credentials
+backend/credentials.json
+backend/token.json
+credentials.json
+token.json
+*.pem
+*.key
+*.p12
+
+# OS / editors
+.DS_Store
+.vscode/
